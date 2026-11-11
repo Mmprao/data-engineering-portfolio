@@ -1,0 +1,10 @@
+order_id,customer,order_date,product,quantity,unit_price
+3001,Ava Patel,2026-10-01,Keyboard,2,49.99
+3002,Jordan Lee,2026-10-01,Mouse,1,24.50
+3003,Sam Rivera,2026-10-02,Monitor,1,189.00
+3004,Taylor Kim,2026-10-02,Keyboard,3,49.99
+3002,Jordan Lee,2026-10-01,Mouse,1,24.50
+3005,,2026-10-03,Webcam,2,39.00
+3006,Morgan Chen,not-a-date,Headset,1,59.99
+3007,Casey Brown,2026-10-04,Mouse,0,24.50
+3008,Riley Shah,2026-10-04,Webcam,2,39.00
