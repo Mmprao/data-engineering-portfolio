@@ -1,0 +1,93 @@
+{
+  "name": "pl_orders_landing_to_bronze_and_transform",
+  "properties": {
+    "description": "Portfolio template: copy landing orders into ADLS Bronze, then invoke a Databricks notebook for Silver, Quarantine, and Gold transformations.",
+    "activities": [
+      {
+        "name": "Copy_Landing_To_Bronze",
+        "type": "Copy",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "source": {
+            "type": "DelimitedTextSource",
+            "storeSettings": {
+              "type": "AzureBlobFSReadSettings",
+              "recursive": true,
+              "enablePartitionDiscovery": false
+            },
+            "formatSettings": {
+              "type": "DelimitedTextReadSettings"
+            }
+          },
+          "sink": {
+            "type": "DelimitedTextSink",
+            "storeSettings": {
+              "type": "AzureBlobFSWriteSettings"
+            },
+            "formatSettings": {
+              "type": "DelimitedTextWriteSettings",
+              "quoteAllText": true,
+              "fileExtension": ".csv"
+            }
+          },
+          "enableStaging": false
+        },
+        "inputs": [
+          {
+            "referenceName": "ds_landing_orders_csv",
+            "type": "DatasetReference"
+          }
+        ],
+        "outputs": [
+          {
+            "referenceName": "ds_bronze_orders_csv",
+            "type": "DatasetReference"
+          }
+        ]
+      },
+      {
+        "name": "Transform_Bronze_To_Silver_And_Gold",
+        "type": "DatabricksNotebook",
+        "dependsOn": [
+          {
+            "activity": "Copy_Landing_To_Bronze",
+            "dependencyConditions": ["Succeeded"]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 1,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "userProperties": [],
+        "typeProperties": {
+          "notebookPath": "/Shared/portfolio/transform_orders",
+          "baseParameters": {
+            "bronze_path": "abfss://datalake@<storage-account>.dfs.core.windows.net/bronze/orders/",
+            "silver_path": "abfss://datalake@<storage-account>.dfs.core.windows.net/silver/orders/",
+            "gold_path": "abfss://datalake@<storage-account>.dfs.core.windows.net/gold/daily_sales/",
+            "quarantine_path": "abfss://datalake@<storage-account>.dfs.core.windows.net/quarantine/orders/"
+          }
+        },
+        "linkedServiceName": {
+          "referenceName": "ls_azure_databricks",
+          "type": "LinkedServiceReference"
+        }
+      }
+    ],
+    "annotations": [
+      "portfolio-template",
+      "medallion-architecture"
+    ]
+  }
+}
